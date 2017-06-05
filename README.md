@@ -14,7 +14,8 @@ java -jar target/external-example-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 ## Installation
-
+After making sure that your client credentials are set in the constants that 
+are at the top of AuthenticationExample class, run:
 ```bash
 mvn clean install
 ```
