@@ -1,14 +1,14 @@
 import com.google.gson.internal.LinkedTreeMap;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 
 
-public class AuthenticationExample {
+public class FeedvisorAPIExample {
 
     private static final String CLIENT_ID = "Y0u2Cl1N71d";
     private static final String CLIENT_SECRET = "Y0u2Cl1N753c237";
-    private static final String FILE_TARGET = "AuthenticationExample.xlsx";
+//    private static final String FILE_TARGET = "FeedvisorAPIExample.xlsx";
 
 
     static public void main(String args[]) throws IOException {
@@ -21,18 +21,9 @@ public class AuthenticationExample {
 
             //get a configurations report for the first storefront
             String accountId = accountIds.keySet().iterator().next();
-            XSSFWorkbook file = ExternalApiHelper.exportReport(accountId, accessToken, accountId + "_" + FILE_TARGET);
 
-            //changing a listing to reprice
-            XLSXHelper.setCellValue(2, "Reprice", "Yes", 1, 1, file);
-            XLSXHelper.saveFile(accountId + "_" + FILE_TARGET, file);
-
-            //sending a feed
-            File resultFile = ExternalApiHelper.importFeeds(accountId, accessToken, accountId + "_" + FILE_TARGET);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -1,17 +1,18 @@
+import com.google.gson.Gson;
+import model.ListingUpdateRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,9 @@ class HttpRestClient {
     private HttpPost post;
     private HttpGet get;
     private Map<String, String> headers;
+    private HttpPut put;
+    Gson gson = new Gson();
+    RestTemplate restTemplate = new Re
 
 
     public HttpRestClient() {
@@ -47,70 +51,6 @@ class HttpRestClient {
     }
 
 
-    public InputStream sendGetReturnStream(String url) throws Exception {
-        get = new HttpGet(url);
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                get.addHeader(entry.getKey(), entry.getValue());
-            }
-
-        }
-        HttpResponse response = client.execute(get);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new Exception(response.getStatusLine().getReasonPhrase());
-        }
-        return response.getEntity().getContent();
-    }
-
-    public String sendPost(String url, Map<String, String> bodyParam) throws Exception {
-        post = new HttpPost(url);
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                post.addHeader(entry.getKey(), entry.getValue());
-            }
-
-        }
-        List<NameValuePair> nvps = new ArrayList<>();
-        for (Map.Entry<String, String> entry : bodyParam.entrySet()) {
-            nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-        }
-        post.setEntity(new UrlEncodedFormEntity(nvps));
-
-        HttpResponse response = client.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new Exception(response.getStatusLine().getReasonPhrase());
-        }
-        return EntityUtils.toString(response.getEntity());
-
-    }
-
-    public String sendPost(String url, Map<String, String> bodyParam, String filePath) throws Exception {
-        post = new HttpPost(url);
-        post.addHeader("enctype", "multipart/form-data");
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                post.addHeader(entry.getKey(), entry.getValue());
-            }
-
-        }
-
-        File file = new File(filePath);
-        FileBody fileBody = new FileBody(file);
-        MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create();
-        multipartEntity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        multipartEntity.addPart("file", fileBody);
-        multipartEntity.addTextBody("fileName", file.getName());
-        for (Map.Entry<String, String> entry : bodyParam.entrySet()) {
-            multipartEntity.addTextBody(entry.getKey(), entry.getValue());
-        }
-        post.setEntity(multipartEntity.build());
-        HttpResponse response = client.execute(post);
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new Exception(response.getStatusLine().getReasonPhrase());
-        }
-        return EntityUtils.toString(response.getEntity());
-    }
-
     public void addHeaders(String key, String value) {
         if (headers == null) {
             headers = new HashMap<>();
@@ -118,4 +58,39 @@ class HttpRestClient {
         headers.put(key, value);
     }
 
+    public String sendPut(String url, List<ListingUpdateRequest> listingUpdateRequestList) throws Exception {
+        put = new HttpPut(url);
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                put.addHeader(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        put.setEntity(new StringEntity(gson.toJson(listingUpdateRequestList)));
+
+        HttpResponse response = client.execute(put);
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new Exception(response.getStatusLine().getReasonPhrase());
+        }
+        return EntityUtils.toString(response.getEntity());
+    }
+
+    public String sendPut(String url, List<ListingUpdateRequest> listingUpdateRequestList) throws Exception {
+        put = new HttpPut(url);
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                put.addHeader(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        put.setEntity(new StringEntity(gson.toJson(listingUpdateRequestList)));
+
+        HttpResponse response = client.execute(put);
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new Exception(response.getStatusLine().getReasonPhrase());
+        }
+        return EntityUtils.toString(response.getEntity());
+    }
 }
